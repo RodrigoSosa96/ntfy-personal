@@ -1,0 +1,82 @@
+mode: local
+# container: ntfy
+
+# Templates reutilizables para no repetir ACL en cada usuario
+templates:
+  devops_view_all:
+    access:
+      - { topic: "*", perm: "read-only" }
+
+  dev_default:
+    access:
+      - { topic: "deploy-*", perm: "read-only" }
+      - { topic: "uptime-*", perm: "read-only" }
+      - { topic: "alerts-*", perm: "read-only" }
+
+  # Identidades de sistema (publishers) - mínimo privilegio
+  publisher_dokploy:
+    access:
+      - { topic: "deploy-*", perm: "write-only" }
+    tokens:
+      ensureCount: 1
+
+  publisher_github:
+    access:
+      - { topic: "deploy-*", perm: "write-only" }
+    tokens:
+      ensureCount: 1
+
+  publisher_uptime:
+    access:
+      - { topic: "uptime-*", perm: "write-only" }
+    tokens:
+      ensureCount: 1
+
+users:
+  # DevOps: ven todo
+  - username: rodrigo
+    role: user
+    passwordEnv: NTFY_PASS_RODRIGO
+    applyTemplates: [devops_view_all]
+    # opcional, espacio personal:
+    access:
+      - { topic: "user-rodrigo-*", perm: "rw" }
+
+  - username: ale
+    role: user
+    passwordEnv: NTFY_PASS_ALE
+    applyTemplates: [devops_view_all]
+    access:
+      - { topic: "user-ale-*", perm: "rw" }
+
+  - username: juan
+    role: user
+    passwordEnv: NTFY_PASS_JUAN
+    applyTemplates: [devops_view_all]
+    access:
+      - { topic: "user-juan-*", perm: "rw" }
+
+  # Dev: ve lo normal + RW en team-dev
+  - username: martin
+    role: user
+    passwordEnv: NTFY_PASS_MARTIN
+    applyTemplates: [dev_default]
+    access:
+      - { topic: "team-dev-*", perm: "rw" }
+      - { topic: "user-martin-*", perm: "rw" }
+
+  # Publishers (servicios)
+  - username: dokploy
+    role: user
+    passwordEnv: NTFY_PASS_DOKPLOY
+    applyTemplates: [publisher_dokploy]
+
+  - username: github
+    role: user
+    passwordEnv: NTFY_PASS_GITHUB
+    applyTemplates: [publisher_github]
+
+  - username: uptime-bot
+    role: user
+    passwordEnv: NTFY_PASS_UPTIME
+    applyTemplates: [publisher_uptime]

@@ -1,0 +1,56 @@
+services:
+  ntfy:
+    image: binwiederhier/ntfy
+    restart: unless-stopped
+    command: ["serve"]
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+      - NTFY_LOG_LEVEL=info
+    volumes:
+      - ntfy-data:/var/lib/ntfy
+      - ntfy-cache:/var/cache/ntfy
+      - ../files/server.yml:/etc/ntfy/server.yml:ro
+      - ../files/templates:/etc/ntfy/templates:ro
+      - ../files/firebase.json:/etc/ntfy/firebase.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ntfy.rule=Host(`ntfy.apps.lab9.co`)
+      - traefik.http.routers.ntfy.entrypoints=websecure
+      - traefik.http.routers.ntfy.tls=true
+      - traefik.http.routers.ntfy.tls.certresolver=letsencrypt
+      - traefik.http.services.ntfy.loadbalancer.server.port=80
+
+  ntfy-provision:
+    image: binwiederhier/ntfy
+    profiles: ["ops"]          # no arranca por defecto
+    depends_on:
+      - ntfy
+    user: root
+    working_dir: /work
+    volumes:
+      - ntfy-data:/var/lib/ntfy
+      - ../files/server.yml:/etc/ntfy/server.yml:ro
+      - ./provision:/work:rw
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - "apk add --no-cache python3 py3-yaml && python3 /work/ntfy_provision.py /work/provision.yml --mode local"
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+    networks:
+      - dokploy-network
+
+volumes:
+  ntfy-data:
+  ntfy-cache:
+
+networks:
+  dokploy-network:
+    external: true

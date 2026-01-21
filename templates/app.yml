@@ -1,0 +1,11 @@
+title: |
+  {{- if eq .status "firing" }}
+    {{- if gt .percent 90.0 }}🚨 Critical alert
+    {{- else }}⚠️ Alert{{- end }}
+  {{- else if eq .status "resolved" }}
+  ✅ Alert resolved
+  {{- end }}
+message: |
+  Status: {{ .status }}
+  Type: {{ .type | upper }} ({{ .percent }}%)
+  Server: {{ .server }}

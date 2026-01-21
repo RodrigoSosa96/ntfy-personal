@@ -1,0 +1,4 @@
+provision/out/
+provision/out/secrets.env
+*.log
+firebase.json
