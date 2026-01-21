@@ -131,7 +131,7 @@ auth-tokens: []
 #
 behind-proxy: true
 proxy-forwarded-header: "X-Forwarded-For"
-proxy-trusted-hosts: "127.0.0.1, ::1, 10.0.1.0/24"
+proxy-trusted-hosts: "127.0.0.1, 10.0.1.0/24"
 
 # If enabled, clients can attach files to notifications as attachments. Minimum settings to enable attachments
 # are "attachment-cache-dir" and "base-url".
