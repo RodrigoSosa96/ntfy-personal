@@ -9,8 +9,8 @@ services:
     volumes:
       - ntfy-data:/var/lib/ntfy
       - ntfy-cache:/var/cache/ntfy
-      - ../files/server.yml:/etc/ntfy/server.yml:ro
-      - ../files/templates:/etc/ntfy/templates:ro
+      - ./server.yml:/etc/ntfy/server.yml:ro
+      - ./templates:/etc/ntfy/templates:ro
       - ../files/ntfy-lab9-internal-firebase-adminsdk-fbsvc-96ed9cd24a.json:/etc/ntfy/ntfy-lab9-internal-firebase-adminsdk-fbsvc-96ed9cd24a.json:ro
     healthcheck:
       test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
@@ -37,7 +37,7 @@ services:
     working_dir: /work
     volumes:
       - ntfy-data:/var/lib/ntfy
-      - ../files/server.yml:/etc/ntfy/server.yml:ro
+      - ./server.yml:/etc/ntfy/server.yml:ro
       - ./provision:/work:rw
     entrypoint: ["/bin/sh", "-c"]
     command:
